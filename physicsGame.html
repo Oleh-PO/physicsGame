@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>GameSS</title>
+</head>
+<body>
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+	<canvas id = "canvas" width="200" height="200"></canvas>
+	<script>
+		var canvas = document.getElementById("canvas");
+		var ctx = canvas.getContext("2d");
+		var ilength = 100;
+		var xLength = 10;
+		var positionX = 0;
+		var positionY = 0;
+		var xSpeed = 0;
+		var ySpeed = 0;
+		var defoldXSpeed = 2;
+		var defoldYSpeed = 3;
+		var xBlock = 0;
+		var yBlock = 0;
+		var jump = false;
+		var restar = true;
+		var buletLog = {
+			x : -10,
+			y : -10,
+		};
+		var buletShut = 0;
+		var word = {
+			30 : "wall",
+			31 : "wall",
+			32 : "wall",
+			33 : "wall",
+			44 : "wall",
+			54 : "wall",
+			64 : "wall",
+			74 : "wall",
+			57 : "wall",
+			68 : "wall",
+			69 : "ladder",
+			79 : "ladder",
+		};
+		var anemy = {
+			x : 130,
+			y : 70,
+		};
+		var spikePover = function () {
+			var x = 0;
+			var y = 0;
+			for (var i = 0; i < ilength; i++) {
+				if (restar === true) {
+					restar = false;
+				} else if (y === 0) {
+					if (word[x] === "spike") {
+						portalCor = x;
+					};
+				} else if (y > 0) {
+					if (word[String(y) + String(x)] === "spike") {
+						portalCor = String(y) + String(x);
+						// portalCor = +portalBCor;
+					};
+				};
+				if (x === xLength) {
+					x = 0;
+					y++;
+				} else {
+					x++;
+				};
+			};
+			restar = true;
+			var spikeX = portalCor[1] * 15;
+			var spikeY = portalCor[1] * 15;
+			console.log(portalCor[1] * 15 + " spikeX");
+			console.log(portalCor[0] * 15 + " spikeY");
+			console.log(positionX + " positionX");
+			console.log(positionY + " positionY");
+
+			if (spikeX === positionX && spikeY === positionY) {
+			console.log(122);
+			};
+		};
+		var bulet = function () { 
+			xBulet = anemy["x"] - buletLog["x"];
+			yBulet = anemy["y"] - buletLog["y"];
+			if (xBulet < 7 && xBulet > -7) {
+				console.log("xBulet");
+				if (yBulet < 7 && yBulet > -7) {
+					console.log("yBulet");
+					anemy = {
+						x : -30,
+						y : -35,
+					};
+				};
+			};
+		};
+		var enemyPover = function () {
+			xAnemy = positionX < anemy["x"];
+			xAnemy1 = anemy["x"] < (positionX + 18);
+			yAnemy = positionY < anemy["y"];
+			yAnemy1 = anemy["y"] < (positionY + 18);
+			if (xAnemy === true && yAnemy === true && xAnemy1 === true && yAnemy1 === true) {
+				positionX = 0;
+				positionY = 0;
+				xSpeed = 0;
+				ySpeed = 0;
+				console.log("bom");
+			};
+		};
+		var anemyGo = function () {
+			if (anemy["x"] - positionX > anemy["y"] - positionY && anemy["x"] - positionX > 0) {
+				anemy["x"]--;
+				console.log(1);
+			}
+			else if (anemy["x"] - positionX > anemy["y"] - positionY && anemy["x"] - positionX < 0) {
+				anemy["x"]++;
+				console.log(2);
+			}
+			else if (anemy["x"] - positionX < anemy["y"] - positionY && anemy["x"] - positionY > 0) {
+				anemy["y"]--;
+				console.log(3);
+			}
+			else if (anemy["x"] - positionX < anemy["y"] - positionY && anemy["x"] - positionY < 0) {
+				anemy["y"]++;
+				console.log(4);
+			};
+			console.log(true);
+		}
+		var gameRender = function() { //canvas game art
+			ctx.clearRect(0, 0, 200, 200);
+			var renderX = 0;
+			var renderY = 0;
+			var render = 0;
+			for (var i = 0; i < ilength; i++) {
+				if (word[render] === "wall") {
+					ctx.fillStyle = "Black";
+				} 
+				else if (word[render] === "door") {
+					if (doorOpen !== true) {
+						ctx.fillStyle = "SaddleBrown";
+					} else {
+						ctx.fillStyle = "white";
+					};
+				} 
+				else if (word[render] === "button") {
+					ctx.fillStyle = "DarkGrey";
+				} 
+				else if (word[render] === "portalA") {
+					ctx.fillStyle = "Gold";
+				}
+				 else if (word[render] === "portalB") {
+					ctx.fillStyle = "DeepSkyBlue";
+				} 
+				else if (word[render] === "spike") {
+					ctx.lineWidth = 2;
+					ctx.strokeStyle = "LightSteelBlue";
+					ctx.fillStyle = "LightSteelBlue";
+					ctx.beginPath();
+					ctx.moveTo(renderX * 15,(renderY + 1) * 15);
+					ctx.lineTo((renderX * 15) + 7.5, renderY * 15);
+					ctx.lineTo((renderX + 1) * 15, (renderY + 1) * 15);
+					ctx.lineTo(renderX * 15, (renderY + 1) * 15);
+					ctx.fill();
+				}
+				 else if (word[render] === "buster") {
+					if (busterAvailable === true) {
+						ctx.fillStyle = "SeaGreen";
+					} 
+					else {
+						ctx.fillStyle = "white";
+					}
+				}
+				 else if (word[render] === "lever") {
+					ctx.fillStyle = "SlateGrey";
+				} else if (word[render] === "ladder") {
+					ctx.lineWidth = 2;
+					ctx.strokeStyle = "Peru";
+					ctx.beginPath();
+					ctx.moveTo(renderX * 15, renderY * 15);
+					ctx.lineTo(renderX * 15, (renderY + 1) * 15);
+
+					ctx.moveTo(renderX * 15, (renderY * 15) + 9);
+					ctx.lineTo((renderX + 1) * 15, (renderY * 15) + 9);
+
+					ctx.moveTo((renderX + 1) * 15, renderY * 15);
+					ctx.lineTo((renderX + 1) * 15, (renderY + 1) * 15);
+					ctx.stroke();
+				}
+				else {
+					ctx.fillStyle = "white";
+				}
+				if (word[render] !== "ladder" && word[render] !== "spike") { 
+					ctx.fillRect(renderX * 15, renderY * 15, 15, 15);
+				};
+				if (renderX === xLength) {
+					renderY++;
+					renderX = 0;
+				} else {
+					renderX++;
+				}
+				if (renderY === 0) {
+					render = String(renderX);
+				} else {
+					render =  String(renderY) + String(renderX);
+				};
+			};
+		};
+		var block = function () { //wall stop
+			xBlock = Math.floor(positionX / 15);
+			xBlock1 = Math.floor(positionX / 15 + 0.95);
+			yBlock1 = Math.floor(positionY / 15 + 0.95);
+			yBlock = Math.floor(positionY / 15);
+			if (word[String(yBlock1) + String(xBlock1)] === "wall" && word[String(yBlock) + String(xBlock1)] === "wall") {
+				xSpeed = 0;
+				positionX = positionX - 1;
+				jump = true;
+				return "wall";
+			}
+			else if (word[String(yBlock1) + String(xBlock)] === "wall" && word[String(yBlock) + String(xBlock)] === "wall") {
+				xSpeed = 0;
+				positionX = positionX + 1;
+				jump = true;
+				return "wall";
+			}
+			if (word[String(yBlock1) + String(xBlock)] === "wall") {
+				// console.log("wall");
+				ySpeed = 0;
+				positionY = positionY - 1;
+				jump = true;
+				return "wall";
+			}
+			else if (word[String(yBlock1) + String(xBlock1)] === "wall") {
+				// console.log("wall1");
+				ySpeed = 0;
+				positionY = positionY - 1
+				jump = true;
+				return "wall";
+			}
+			else if (word[String(yBlock) + String(xBlock)] === "wall") {
+				console.log("not");
+				ySpeed = 0;
+				positionY = positionY + 3;
+				// jump = true;
+			}
+			else if (word[String(yBlock) + String(xBlock1)] === "wall") {
+				console.log("not1");
+				ySpeed = 0;
+				positionY = positionY + 3;
+				// jump = true;
+			};
+		};
+		var ladder = function () { //lader up
+			xBlock = Math.floor(positionX / 15);
+			xBlock1 = Math.floor(positionX / 15 + 0.95);
+			yBlock1 = Math.floor(positionY / 15 + 0.95);
+			yBlock = Math.floor(positionY / 15);
+			if (word[String(yBlock1) + String(xBlock)] === "ladder") {
+				console.log("ladder");
+				positionY = positionY - 2;
+				jump = true;
+				return "ladder";
+			}
+			else if (word[String(yBlock1) + String(xBlock1)] === "ladder") {
+				console.log("ladder");
+				positionY = positionY - 2;
+				jump = true;
+				return "ladder";
+			}
+			else if (word[String(yBlock) + String(xBlock)] === "ladder") {
+				console.log("ladder");
+				positionY = positionY - 2;
+				jump = true;
+				return "ladder";
+			}
+			else if (word[String(yBlock) + String(xBlock1)] === "ladder") {
+				console.log("ladder");
+				positionY = positionY - 2;
+				jump = true;
+				return "ladder";
+			};
+		};
+		var blockTest = function () {
+			xBlock = Math.floor(positionX / 15);
+			yBlock1 = Math.floor(positionY / 15 + 0.95);
+			yBlock = Math.floor(positionY / 15)
+			if (word[String(yBlock1) + String(xBlock)] === "wall" || word[String(yBlock) + String(xBlock + 1)] === "wall") {
+				jump = true;
+				return true;
+			};
+		};
+		$("body").keydown(function(event) {
+			blockTest();
+			keyCode = event.keyCode;
+			// console.log(keyCode);
+			// console.log(jump);
+			if (keyCode === 87) {
+				keyCode = 32;
+			}
+			if (keyCode === 68) {
+				positionX = positionX + defoldXSpeed;
+				xSpeed = xSpeed + 3;
+				if (xSpeed > 50) {
+					xSpeed = 50;
+				};
+			}
+			else if (keyCode === 65) {
+				positionX = positionX + -defoldXSpeed;
+				xSpeed = xSpeed - 3;
+				if (-xSpeed > 50) {
+					xSpeed = -50;
+				};
+			}
+			else if (keyCode === 32 && jump === true) {
+				// console.log("Y");
+				positionY = positionY + -10;
+				ySpeed = ySpeed - 20;
+				if (-ySpeed > 50) {
+					ySpeed = -50;
+				};
+				jump = false;
+			}
+			else if (keyCode === 37) {
+				buletLog["x"] = positionX;
+				buletLog["y"] = positionY + 5;
+				buletShut = 100;
+				// console.log(buletShut);
+			}
+			else if (keyCode === 39) {
+				buletLog["x"] = positionX;
+				buletLog["y"] = positionY + 5;
+				buletShut = -100;
+				// console.log(buletShut);
+			}
+		});
+		$("body").click(function(event){
+			positionY = positionY + 1;
+		});
+		setInterval(function () { // physics engine
+			// console.log(xSpeed);
+			// console.log(ySpeed);
+			block();
+			ladder();
+			bulet();
+			enemyPover();
+			// spikePover();
+			// anemyGo();
+			if (xSpeed > 0 && xSpeed < 30) {
+				// xSpeed--;
+				xSpeed = xSpeed - 1;
+				// console.log(Math.floor(xSpeed) + " keydown");
+			}
+			else if (xSpeed > 0 && xSpeed > 29) {
+				xSpeed = xSpeed - 2;
+				// console.log(Math.floor(xSpeed) + " keydown");
+			};
+			if (xSpeed < 0 && -xSpeed < 30) {
+				xSpeed = xSpeed + 1;
+				// console.log(Math.floor(xSpeed) + " keyUp");
+			}
+			else if (xSpeed < 0 && -xSpeed > 29) {
+				xSpeed = xSpeed + 2;
+				// console.log(Math.floor(xSpeed) + " keyUp2");
+			};
+			
+			if (ySpeed < 0) { 
+				ySpeed++;
+			};
+			if (ySpeed > 50) { 
+				ySpeed = 49
+			};
+			if (xSpeed > 10 || -xSpeed > 10) {
+				// console.log("tatar");
+				positionX = positionX + Math.floor(xSpeed / 5);
+			} 
+			else {
+				positionX = positionX + Math.floor(xSpeed / 3);
+			};
+			positionY = positionY + Math.floor(ySpeed / 3);
+			if (block() !== "wall" && ladder() !== "ladder") {
+				ySpeed = ySpeed + 2;
+			};
+			if (positionX > 200) {
+				positionX = 0;
+			};
+			if (positionX < -15) {
+				positionX = 200; 
+			};
+			if (positionY > 120) {
+				positionY = 120;
+				ySpeed = 0;
+				jump = true;
+			};
+			if (buletShut < 0) {
+				buletLog["x"] = buletLog["x"] + 4;
+				buletShut = buletShut - 4;
+			};
+			if (buletShut > 0) {
+				buletLog["x"] = buletLog["x"] - 4;
+				buletShut = buletShut + 4;
+			};
+			if (buletShut === 0) {
+				buletShut["x"] = -10;
+				buletShut["y"] = -10;
+			}
+		}, 30);
+		setInterval(function () { 
+			gameRender();
+			ctx.strokeStyle = "Red";
+			ctx.fillStyle = "Red";
+			ctx.beginPath();
+			ctx.arc(buletLog["x"], buletLog["y"], 2, 0, Math.PI * 2, false);
+			ctx.fill();
+			ctx.stroke();
+			ctx.fillStyle = "BlueViolet";
+			ctx.fillRect(positionX, positionY, 15, 15);
+			ctx.fillStyle = "Black";
+			ctx.fillText(xSpeed, 50, 100);
+			ctx.fillRect(50, 100, xSpeed, 15);
+			ctx.fillStyle = "Red"; 
+			ctx.fillText(ySpeed, 50, 120);
+			ctx.fillRect(50, 120, ySpeed, 15);
+			ctx.strokeStyle = "SpringGreen";
+			ctx.fillStyle = "SpringGreen";
+			ctx.beginPath();
+			ctx.arc(anemy["x"], anemy["y"], 2, 0, Math.PI * 2, false);
+			ctx.fill();
+			ctx.stroke();
+		}, 30);
+	</script>
+</body>
+</html>
